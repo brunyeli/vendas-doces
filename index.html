@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vendas · Doces</title>
+<meta name="theme-color" content="#db2777">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vendas Doces">
+<style>
+:root { --bg:#f7f3f5; --panel:#fff; --line:#ece2e7; --line2:#ddcdd6; --fg:#2b1f28; --muted:#76666f; --dim:#a8979f; --brand:#db2777; --brand2:#be185d; --ok:#16a34a; --red:#dc2626; --warn:#b45309; }
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html,body { background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; font-size:15px; }
+button,input,select { font:inherit; color:inherit; }
+.hidden { display:none !important; }
+header { position:sticky; top:0; z-index:5; background:var(--brand); color:#fff; padding:calc(env(safe-area-inset-top) + 10px) 14px 10px; display:flex; align-items:center; gap:10px; }
+header h1 { font-size:16px; font-weight:700; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+header .pend { background:#fff; color:var(--brand2); border-radius:99px; padding:3px 10px; font-size:12.5px; font-weight:700; border:none; }
+main { padding:12px 12px 150px; }
+nav.bottom { position:fixed; left:0; right:0; bottom:0; z-index:6; background:#fff; border-top:1px solid var(--line); display:flex; padding-bottom:env(safe-area-inset-bottom); }
+nav.bottom button { flex:1; background:none; border:none; padding:9px 0 8px; font-size:12px; font-weight:600; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:2px; }
+nav.bottom button.on { color:var(--brand); }
+nav.bottom svg { width:22px; height:22px; }
+svg.i { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+.inp { width:100%; background:#fff; border:1px solid var(--line2); border-radius:10px; padding:11px 12px; outline:none; font-size:16px; }
+.inp:focus { border-color:var(--brand); box-shadow:0 0 0 3px #db277733; }
+.label { display:block; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:12px 0 5px; }
+.chips { display:flex; gap:6px; overflow-x:auto; padding:10px 0 4px; scrollbar-width:none; }
+.chip { flex:none; background:#fff; border:1px solid var(--line2); border-radius:99px; padding:7px 13px; font-size:13.5px; font-weight:600; color:var(--muted); }
+.chip.on { background:#fce7f3; border-color:var(--brand); color:#9d174d; }
+.tiles { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:9px; margin-top:8px; }
+.tile { position:relative; text-align:left; background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 12px 10px 14px; min-height:104px; display:flex; flex-direction:column; overflow:hidden; }
+.tile::before { content:""; position:absolute; left:0; top:12px; bottom:12px; width:4px; border-radius:0 4px 4px 0; background:var(--tc,var(--brand)); }
+.tile:active { transform:scale(.97); background:#fdf2f8; }
+.tile .nm { font-weight:700; font-size:14.5px; line-height:1.25; padding-right:24px; }
+.tile .st { font-size:12px; color:var(--muted); margin-top:2px; }
+.tile .pr { font-size:18px; font-weight:800; margin-top:auto; padding-top:6px; }
+.tile .qt { position:absolute; top:8px; right:8px; background:var(--brand); color:#fff; min-width:24px; height:24px; border-radius:99px; display:grid; place-items:center; font-weight:700; font-size:12.5px; padding:0 6px; }
+.tile.zero { opacity:.55; }
+.red { color:var(--red); } .warn { color:var(--warn); } .ok { color:var(--ok); } .muted { color:var(--muted); } .small { font-size:13px; } .tiny { font-size:11.5px; } .b { font-weight:700; }
+.cartbar { position:fixed; left:10px; right:10px; bottom:calc(64px + env(safe-area-inset-bottom)); z-index:6; background:var(--ok); color:#fff; border:none; border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:10px; font-weight:700; font-size:16px; box-shadow:0 8px 24px #16a34a55; }
+.cartbar .grow { flex:1; text-align:left; }
+.sheet-bg { position:fixed; inset:0; z-index:20; background:#2b1f2866; display:flex; align-items:flex-end; }
+.sheet { width:100%; max-height:92vh; overflow:auto; background:var(--bg); border-radius:18px 18px 0 0; padding:14px 14px calc(18px + env(safe-area-inset-bottom)); }
+.sheet h2 { font-size:17px; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.sheet .x { margin-left:auto; background:#fff; border:1px solid var(--line2); border-radius:99px; width:34px; height:34px; display:grid; place-items:center; }
+.card { background:#fff; border:1px solid var(--line); border-radius:14px; }
+.item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line); }
+.item:last-child { border-bottom:none; }
+.qty { display:flex; align-items:center; border:1px solid var(--line2); border-radius:10px; }
+.qty button { width:36px; height:36px; background:none; border:none; font-size:20px; font-weight:700; color:var(--brand); }
+.qty span { min-width:28px; text-align:center; font-weight:700; }
+.pay { display:grid; grid-template-columns:repeat(2,1fr); gap:7px; }
+.pay button { background:#fff; border:1px solid var(--line2); border-radius:10px; padding:11px 6px; font-weight:600; font-size:14px; color:var(--muted); }
+.pay button.on { border-color:var(--brand); background:#fce7f3; color:#9d174d; }
+.pay .tx { display:block; font-size:11px; font-weight:500; }
+.row { display:flex; align-items:center; gap:8px; }
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.total { font-size:32px; font-weight:800; }
+.btn { border:none; border-radius:12px; padding:14px; font-weight:700; font-size:16px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-ok { background:var(--ok); color:#fff; } .btn-pri { background:var(--brand); color:#fff; } .btn-gh { background:#fff; border:1px solid var(--line2); color:var(--fg); }
+.btn:disabled { opacity:.5; }
+.btn-sm { padding:7px 11px; font-size:13px; width:auto; border-radius:9px; }
+.taxa { background:#fdf2f8; border:1px solid #fbcfe8; border-radius:10px; padding:10px; margin-top:8px; }
+.sw { position:relative; width:44px; height:26px; flex:none; }
+.sw input { opacity:0; width:0; height:0; }
+.sw span { position:absolute; inset:0; background:#e4d6de; border-radius:99px; transition:.15s; }
+.sw span::before { content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.15s; box-shadow:0 1px 2px #0003; }
+.sw input:checked + span { background:var(--brand); }
+.sw input:checked + span::before { transform:translateX(18px); }
+.badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:700; }
+.b-ok { background:#dcfce7; color:#166534; } .b-pend { background:#fef3c7; color:#92400e; } .b-gray { background:#f1e8ed; color:var(--muted); } .b-red { background:#fee2e2; color:#b91c1c; }
+.empty { text-align:center; color:var(--dim); padding:30px 16px; }
+.toast { position:fixed; left:12px; right:12px; bottom:calc(env(safe-area-inset-bottom) + 132px); z-index:30; background:#fff; border-left:5px solid var(--ok); border-radius:12px; padding:13px 15px; box-shadow:0 10px 30px #2b1f2833; font-weight:600; animation:tin .2s; }
+.toast.err { border-left-color:var(--red); }
+@keyframes tin { from { transform:translateY(8px); opacity:0; } }
+.kpi { background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 14px; }
+.kpi .v { font-size:24px; font-weight:800; }
+.sec { color:var(--brand); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin:16px 2px 8px; }
+.welcome { text-align:center; padding:30px 10px; }
+.welcome .logo { width:72px; height:72px; border-radius:18px; margin:0 auto 14px; display:block; }
+ol.passos { text-align:left; margin:14px 0 0 20px; line-height:1.6; color:var(--muted); }
+</style>
+</head>
+<body>
+<header><h1 id="h-loja">Vendas · Doces</h1><button class="pend hidden" id="h-pend"></button></header>
+<main id="view"></main>
+<button class="cartbar hidden" id="cartbar"><svg class="i" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span class="grow" id="cb-txt"></span><span id="cb-tot"></span></button>
+<nav class="bottom">
+  <button data-t="vender" class="on"><svg viewBox="0 0 24 24" class="i"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Vender</button>
+  <button data-t="vendas"><svg viewBox="0 0 24 24" class="i"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/></svg>Vendas</button>
+  <button data-t="enviar"><svg viewBox="0 0 24 24" class="i"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>Enviar</button>
+</nav>
+<div id="sheet-root"></div>
+<script>
+"use strict";
+/* Vendas · Doces (celular) — funciona sem internet. As vendas ficam guardadas neste aparelho até você
+   enviar o arquivo para o computador (WhatsApp, e-mail…) e importar no Controle de Doces. */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const brl = (n) => (Number(n) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const qf = (n) => (Number(n) || 0).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+const parseNum = (v) => { const s = String(v ?? "").trim().replace(/\./g, (m, i, t) => (t.includes(",") ? "" : m)).replace(",", "."); const n = parseFloat(s); return isNaN(n) ? null : n; };
+const semAcento = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const pad = (n) => String(n).padStart(2, "0");
+const agoraTxt = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const hojeISO = () => agoraTxt().slice(0, 10);
+const addDias = (iso, n) => { const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return agoraTxt(d).slice(0, 10); };
+const dataBR = (iso) => (iso ? iso.slice(0, 10).split("-").reverse().join("/") : "");
+const ehFiado = (f) => semAcento(f).trim() === "fiado";
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+const CORES = ["#db2777", "#f59e0b", "#22c55e", "#3b82f6", "#a78bfa", "#ef4444", "#14b8a6", "#f97316", "#eab308", "#8b5cf6"];
+
+/* ---------- armazenamento no aparelho ---------- */
+const CHAVE = "vendas-doces-v1";
+let D = { cat: null, vendas: [], aparelho: uid() };
+function carregar() { try { const s = localStorage.getItem(CHAVE); if (s) D = Object.assign(D, JSON.parse(s)); } catch (e) { /* sem armazenamento */ } }
+function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify(D)); return true; } catch (e) { toast("Não consegui guardar no celular. Libere espaço e tente de novo.", true); return false; } }
+if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+
+function toast(msg, erro = false, ms = 3500) {
+  const t = document.createElement("div"); t.className = "toast" + (erro ? " err" : ""); t.innerHTML = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), ms);
+}
+
+/* ---------- catálogo vindo do computador (#cat=...) ---------- */
+async function lerCatalogoDoLink(texto) {
+  const m = (texto || location.hash).match(/cat=([A-Za-z0-9_-]+)/);
+  if (!m) return false;
+  try {
+    let b64 = m[1].replace(/-/g, "+").replace(/_/g, "/"); while (b64.length % 4) b64 += "=";
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const ds = new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw")));
+    const cat = JSON.parse(await ds.text());
+    if (cat.t !== "doces-cat") throw new Error("link inválido");
+    cat.recebido = Date.now();
+    D.cat = cat; salvar();
+    if (!texto) history.replaceState(null, "", location.pathname);
+    toast(`Catálogo atualizado: ${cat.p.length} doces de ${esc(cat.loja)}.`);
+    return true;
+  } catch (e) {
+    if (!texto) history.replaceState(null, "", location.pathname);
+    toast("Esse link de catálogo não abriu. Gere outro no computador.", true, 6000);
+    return false;
+  }
+}
+
+/* ---------- estado da venda ---------- */
+const S = { tab: "vender", cat: "Todos", busca: "", carrinho: [], pagamento: null, taxaOn: true };
+const produtos = () => (D.cat?.p || []);
+const corDe = (p) => p.k || CORES[p.i % CORES.length];
+function vendidoDesdeCatalogo(pid) {
+  const desde = D.cat?.recebido || 0;
+  return D.vendas.filter((v) => !v.removida && v.ts >= desde).reduce((s, v) => s + v.itens.filter((i) => i.produto_id === pid).reduce((a, i) => a + i.quantidade, 0), 0);
+}
+const saldo = (p) => p.s - vendidoDesdeCatalogo(p.i);
+const naoEnviadas = () => D.vendas.filter((v) => !v.enviada && !v.removida);
+
+function cabecalho() {
+  $("#h-loja").textContent = D.cat ? `${D.cat.loja} · vendas` : "Vendas · Doces";
+  const n = naoEnviadas().length, b = $("#h-pend");
+  b.classList.toggle("hidden", !n); b.textContent = `${n} para enviar`;
+  b.onclick = () => ir("enviar");
+}
+function ir(t) {
+  S.tab = t; $$("nav.bottom button").forEach((b) => b.classList.toggle("on", b.dataset.t === t));
+  cabecalho(); ({ vender: telaVender, vendas: telaVendas, enviar: telaEnviar })[t]();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- VENDER ---------- */
+function telaVender() {
+  const v = $("#view");
+  if (!D.cat) {
+    v.innerHTML = `<div class="welcome"><img class="logo" src="icon-192.png" alt="">
+      <h2 style="font-size:19px">Falta o catálogo de doces</h2>
+      <p class="muted" style="margin-top:6px">Este app recebe os doces e preços do programa do computador.</p>
+      <ol class="passos"><li>No computador, abra o <b>Controle de Doces</b>.</li><li>Vá em <b>Vendas → Celular</b> e clique em <b>Enviar catálogo para o celular</b>.</li><li>Mande o link para você no WhatsApp e toque nele aqui no celular.</li></ol>
+      <p class="small muted" style="margin-top:16px">Ou copie o link e cole aqui:</p>
+      <div class="row" style="margin-top:6px"><input class="inp" id="cat-link0" placeholder="link do catálogo"><button class="btn btn-pri btn-sm" id="cat-ok0">Usar</button></div></div>`;
+    $("#cat-ok0").onclick = async () => { const t = $("#cat-link0").value.trim(); if (t && (await lerCatalogoDoLink(t))) ir("vender"); };
+    $("#cartbar").classList.add("hidden");
+    return;
+  }
+  const ps = produtos();
+  const cats = ["Todos", ...new Set(ps.map((p) => p.c))];
+  if (!cats.includes(S.cat)) S.cat = "Todos";
+  v.innerHTML = `<input class="inp" id="busca" placeholder="Procurar doce…" value="${esc(S.busca)}" autocomplete="off" type="search">
+    <div class="chips">${cats.map((c) => `<button class="chip ${c === S.cat ? "on" : ""}" data-c="${esc(c)}">${esc(c)}</button>`).join("")}</div>
+    <div class="tiles" id="tiles"></div>
+    <p class="tiny muted" style="text-align:center;margin-top:14px">Catálogo de ${dataBR(D.cat.em)} ${D.cat.em.slice(11, 16)} · estoque estimado</p>`;
+  $("#busca").oninput = (e) => { S.busca = e.target.value; tiles(); };
+  $(".chips").onclick = (e) => { const b = e.target.closest("[data-c]"); if (!b) return; S.cat = b.dataset.c; $$(".chip").forEach((x) => x.classList.toggle("on", x === b)); tiles(); };
+  tiles(); barra();
+}
+function tiles() {
+  const q = semAcento(S.busca);
+  const lista = produtos().filter((p) => (S.cat === "Todos" || p.c === S.cat) && (!q || semAcento(p.n).includes(q)));
+  $("#tiles").innerHTML = lista.map((p) => {
+    const c = S.carrinho.find((i) => i.id === p.i); const disp = saldo(p) - (c ? c.qtd : 0);
+    return `<button class="tile ${disp <= 0 ? "zero" : ""}" data-id="${p.i}" style="--tc:${corDe(p)}">${c ? `<span class="qt">${qf(c.qtd)}</span>` : ""}
+      <span class="nm">${esc(p.n)}</span><span class="st ${disp <= 0 ? "red" : ""}">${disp <= 0 ? "Sem estoque" : `${qf(disp)} ${esc(p.u)}`}</span><span class="pr">${brl(p.$)}</span></button>`;
+  }).join("") || `<div class="empty" style="grid-column:1/-1">Nenhum doce encontrado.</div>`;
+  $("#tiles").onclick = (e) => { const t = e.target.closest(".tile"); if (t) adicionar(+t.dataset.id); };
+}
+function adicionar(id, n = 1) {
+  const p = produtos().find((x) => x.i === id); if (!p) return;
+  const c = S.carrinho.find((i) => i.id === id); const atual = c ? c.qtd : 0;
+  if (atual + n > saldo(p) && !D.cat.neg && !confirm(`${p.n}: pelo catálogo restam ${qf(saldo(p))}. Vender mesmo assim?`)) return;
+  if (c) c.qtd += n; else S.carrinho.push({ id, nome: p.n, preco: p.$, qtd: n });
+  if (navigator.vibrate) navigator.vibrate(15);
+  tiles(); barra();
+}
+function barra() {
+  const b = $("#cartbar"), n = S.carrinho.reduce((s, i) => s + i.qtd, 0);
+  b.classList.toggle("hidden", !n || S.tab !== "vender");
+  $("#cb-txt").textContent = `${qf(n)} ${n === 1 ? "item" : "itens"} · Finalizar`;
+  $("#cb-tot").textContent = brl(S.carrinho.reduce((s, i) => s + i.qtd * i.preco, 0));
+}
+$("#cartbar").onclick = () => finalizarSheet();
+
+const taxaDe = (f) => +((D.cat?.tx || {})[f] || 0);
+function totais(desc, taxaOn, taxaPerc) {
+  const sub = S.carrinho.reduce((s, i) => s + i.qtd * i.preco, 0);
+  const d = Math.min(desc || 0, sub), base = +(sub - d).toFixed(2);
+  const t = taxaDe(S.pagamento) && taxaOn ? (taxaPerc > 0 && taxaPerc < 50 ? taxaPerc : 0) : 0;
+  const total = t ? +(base / (1 - t / 100)).toFixed(2) : base;
+  return { sub, desc: d, base, taxa: t, acrescimo: +(total - base).toFixed(2), total };
+}
+function finalizarSheet() {
+  const formas = D.cat.pg?.length ? D.cat.pg : ["Dinheiro", "Pix", "Cartão de débito", "Cartão de crédito", "Fiado"];
+  if (!S.pagamento || !formas.includes(S.pagamento)) S.pagamento = formas[0];
+  const root = $("#sheet-root");
+  root.innerHTML = `<div class="sheet-bg"><div class="sheet">
+    <h2>Finalizar venda <button class="x" id="sx">✕</button></h2>
+    <div class="card" id="itens"></div>
+    <span class="label">Pagamento</span>
+    <div class="pay" id="pay">${formas.map((f) => `<button data-f="${esc(f)}" class="${f === S.pagamento ? "on" : ""}">${esc(f)}${taxaDe(f) ? `<span class="tx">taxa ${qf(taxaDe(f))}%</span>` : ""}</button>`).join("")}</div>
+    <div class="taxa hidden" id="taxa"><div class="row"><label class="sw"><input type="checkbox" id="tx-on" ${S.taxaOn ? "checked" : ""}><span></span></label>
+      <b class="small" style="flex:1">Acrescentar taxa do cartão</b><input class="inp" id="tx" inputmode="decimal" style="width:70px;text-align:right;padding:7px"><span class="small">%</span></div></div>
+    <div id="fiado" class="hidden"><div class="g2"><div><span class="label">Cliente *</span><input class="inp" id="cli" placeholder="Quem vai pagar"></div>
+      <div><span class="label">Pagar até *</span><input class="inp" id="venc" type="date" min="${hojeISO()}"></div></div>
+      <div class="chips">${[[7, "7 dias"], [15, "15 dias"], [30, "30 dias"]].map(([d, t]) => `<button class="chip" data-p="${d}">${t}</button>`).join("")}</div></div>
+    <div class="g2">
+      <div><span class="label">Desconto (R$)</span><input class="inp" id="desc" inputmode="decimal" placeholder="0,00"></div>
+      <div id="rec-box"><span class="label">Recebido (R$)</span><input class="inp" id="rec" inputmode="decimal" placeholder="para o troco"></div>
+    </div>
+    <div class="row" style="margin-top:14px;align-items:flex-end"><div style="flex:1"><div class="label" style="margin:0">Total</div><div class="total" id="tot"></div><div class="tiny muted" id="det"></div></div>
+      <div style="text-align:right"><div class="label" style="margin:0">Troco</div><div class="b" style="font-size:20px" id="troco">—</div></div></div>
+    <button class="btn btn-ok" style="margin-top:14px" id="fim">✓ Registrar venda</button>
+  </div></div>`;
+  const fechar = () => (root.innerHTML = "");
+  $("#sx").onclick = fechar;
+  $(".sheet-bg").onclick = (e) => { if (e.target.classList.contains("sheet-bg")) fechar(); };
+  const itensUI = () => {
+    $("#itens").innerHTML = S.carrinho.map((i, k) => `<div class="item"><div style="flex:1;min-width:0"><div class="b">${esc(i.nome)}</div><div class="tiny muted">${brl(i.preco)} · ${brl(i.qtd * i.preco)}</div></div>
+      <div class="qty"><button data-k="${k}" data-d="-1">−</button><span>${qf(i.qtd)}</span><button data-k="${k}" data-d="1">+</button></div></div>`).join("")
+      || `<div class="empty">Venda vazia.</div>`;
+  };
+  $("#itens").onclick = (e) => { const b = e.target.closest("[data-d]"); if (!b) return; const i = S.carrinho[+b.dataset.k];
+    if (+b.dataset.d > 0) adicionar(i.id, 1); else { i.qtd -= 1; if (i.qtd <= 0) S.carrinho.splice(+b.dataset.k, 1); tiles(); barra(); }
+    if (!S.carrinho.length) return fechar(); itensUI(); calc(); };
+  const calc = () => {
+    const f = S.pagamento, fi = ehFiado(f);
+    $("#taxa").classList.toggle("hidden", !taxaDe(f));
+    $("#fiado").classList.toggle("hidden", !fi);
+    $("#rec-box").style.visibility = f === "Dinheiro" ? "visible" : "hidden";
+    const t = totais(parseNum($("#desc").value), $("#tx-on").checked, parseNum($("#tx").value));
+    $("#tot").textContent = brl(t.total);
+    $("#det").textContent = [t.desc ? `desconto ${brl(t.desc)}` : "", t.acrescimo ? `+ taxa ${brl(t.acrescimo)}` : ""].filter(Boolean).join(" · ");
+    const r = parseNum($("#rec").value);
+    $("#troco").textContent = f === "Dinheiro" && r != null && r >= t.total ? brl(r - t.total) : "—";
+    return t;
+  };
+  $("#pay").onclick = (e) => { const b = e.target.closest("[data-f]"); if (!b) return; S.pagamento = b.dataset.f;
+    $$("#pay button").forEach((x) => x.classList.toggle("on", x === b)); $("#tx").value = qf(taxaDe(S.pagamento)); calc(); };
+  $("#fiado .chips").onclick = (e) => { const b = e.target.closest("[data-p]"); if (!b) return; $("#venc").value = addDias(hojeISO(), +b.dataset.p); calc(); };
+  ["#desc", "#rec", "#tx"].forEach((s) => ($(s).oninput = calc));
+  $("#tx-on").onchange = (e) => { S.taxaOn = e.target.checked; calc(); };
+  $("#tx").value = qf(taxaDe(S.pagamento));
+  itensUI(); calc();
+  $("#fim").onclick = () => {
+    const t = calc(), f = S.pagamento;
+    if (ehFiado(f) && !$("#cli").value.trim()) { toast("No fiado, informe o nome do cliente.", true); return $("#cli").focus(); }
+    if (ehFiado(f) && !$("#venc").value) { toast("No fiado, informe a data prevista para o pagamento.", true); return $("#venc").focus(); }
+    const venda = { uid: uid(), ts: Date.now(), data_hora: agoraTxt(), forma_pagamento: f, desconto: t.desc, taxa_perc: t.taxa || 0,
+      total: t.total, cliente: $("#cli").value.trim(), vencimento: ehFiado(f) ? $("#venc").value : null,
+      itens: S.carrinho.map((i) => ({ produto_id: i.id, nome: i.nome, quantidade: i.qtd, preco: i.preco })), enviada: false };
+    D.vendas.push(venda);
+    if (!salvar()) { D.vendas.pop(); return; }
+    const troco = $("#troco").textContent;
+    S.carrinho = []; fechar(); tiles(); barra(); cabecalho();
+    if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
+    toast(`Venda registrada · <b>${brl(venda.total)}</b> (${esc(f)})${troco !== "—" ? ` · troco <b>${troco}</b>` : ""}`);
+  };
+}
+
+/* ---------- VENDAS ---------- */
+function telaVendas() {
+  $("#cartbar").classList.add("hidden");
+  const lista = D.vendas.filter((v) => !v.removida).slice().reverse();
+  const hoje = hojeISO();
+  const deHoje = lista.filter((v) => v.data_hora.startsWith(hoje));
+  const porDia = {};
+  lista.slice(0, 300).forEach((v) => (porDia[v.data_hora.slice(0, 10)] ||= []).push(v));
+  $("#view").innerHTML = `<div class="g2"><div class="kpi"><div class="tiny muted">VENDIDO HOJE</div><div class="v">${brl(deHoje.reduce((s, v) => s + v.total, 0))}</div><div class="tiny muted">${deHoje.length} vendas</div></div>
+    <div class="kpi"><div class="tiny muted">PARA ENVIAR</div><div class="v">${naoEnviadas().length}</div><div class="tiny muted">${brl(naoEnviadas().reduce((s, v) => s + v.total, 0))}</div></div></div>
+    ${Object.keys(porDia).length ? Object.entries(porDia).map(([dia, vs]) => `<div class="sec">${dia === hoje ? "Hoje" : dataBR(dia)} · ${brl(vs.reduce((s, v) => s + v.total, 0))}</div>
+      <div class="card">${vs.map((v) => `<div class="item"><div style="flex:1;min-width:0"><div class="b">${brl(v.total)} <span class="badge b-gray">${esc(v.forma_pagamento)}</span></div>
+        <div class="tiny muted">${v.data_hora.slice(11, 16)} · ${esc(v.itens.map((i) => `${qf(i.quantidade)}× ${i.nome}`).join(", "))}${v.cliente ? ` · ${esc(v.cliente)}` : ""}${v.vencimento ? ` · paga até ${dataBR(v.vencimento)}` : ""}</div></div>
+        ${v.enviada ? `<span class="badge b-ok">enviada</span>` : `<button class="btn btn-gh btn-sm" data-del="${v.uid}">Apagar</button>`}</div>`).join("")}</div>`).join("")
+      : `<div class="empty">Nenhuma venda feita neste celular ainda.</div>`}
+    <p class="tiny muted" style="margin-top:12px">Venda já enviada só pode ser cancelada no computador (Vendas → Cancelar).</p>`;
+  $("#view").onclick = (e) => { const b = e.target.closest("[data-del]"); if (!b) return;
+    if (!confirm("Apagar esta venda? Ela ainda não foi enviada ao computador.")) return;
+    const v = D.vendas.find((x) => x.uid === b.dataset.del); v.removida = true; salvar(); cabecalho(); telaVendas(); };
+}
+
+/* ---------- ENVIAR ---------- */
+function arquivoVendas(lista) {
+  const dados = { tipo: "doces-celular-vendas", versao: 1, loja: D.cat?.loja || "", aparelho: D.aparelho, gerado_em: agoraTxt(),
+    vendas: lista.map(({ uid, data_hora, forma_pagamento, desconto, taxa_perc, total, cliente, vencimento, itens }) => ({ uid, data_hora, forma_pagamento, desconto, taxa_perc, total, cliente, vencimento, itens })) };
+  const nome = `vendas_celular_${agoraTxt().slice(0, 16).replace(" ", "_").replace(":", "h")}.json`;
+  return new File([JSON.stringify(dados, null, 1)], nome, { type: "application/json" });
+}
+async function enviar(lista, marcar = true) {
+  if (!lista.length) return toast("Nenhuma venda para enviar.", true);
+  const f = arquivoVendas(lista);
+  let ok = false;
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      await navigator.share({ files: [f], title: "Vendas do celular", text: `Vendas do celular: ${lista.length} venda(s), ${brl(lista.reduce((s, v) => s + v.total, 0))}` });
+      ok = true;
+    } else {
+      const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
+      ok = confirm("O arquivo foi baixado no celular. Conseguiu mandar para o computador? (OK marca as vendas como enviadas)");
+    }
+  } catch (e) { if (e.name !== "AbortError") toast("Não consegui compartilhar. Use “Baixar arquivo”.", true); }
+  if (ok && marcar) { const ids = new Set(lista.map((v) => v.uid)); D.vendas.forEach((v) => { if (ids.has(v.uid)) { v.enviada = true; v.enviada_em = Date.now(); } }); salvar(); }
+  if (ok) toast(`${lista.length} venda(s) enviada(s). Agora importe no computador.`);
+  cabecalho(); telaEnviar();
+}
+function telaEnviar() {
+  $("#cartbar").classList.add("hidden");
+  const pend = naoEnviadas(), tot = pend.reduce((s, v) => s + v.total, 0);
+  const hoje = D.vendas.filter((v) => !v.removida && v.data_hora.startsWith(hojeISO()));
+  $("#view").innerHTML = `<div class="kpi" style="text-align:center;padding:20px">
+      <div class="tiny muted">VENDAS PARA ENVIAR AO COMPUTADOR</div><div class="v" style="font-size:40px">${pend.length}</div><div class="muted">${brl(tot)}</div>
+      <button class="btn btn-pri" style="margin-top:14px" id="b-env" ${pend.length ? "" : "disabled"}>Enviar para o computador</button>
+      <p class="tiny muted" style="margin-top:8px">Abre o compartilhar do celular: escolha WhatsApp (mande para você mesmo) ou e-mail.</p></div>
+    <div class="sec">Como importar no computador</div>
+    <div class="card" style="padding:12px 14px;line-height:1.55" ><ol style="margin-left:18px" class="small">
+      <li>Abra a mensagem no WhatsApp Web/Desktop ou no e-mail e salve o arquivo <b>vendas_celular_….json</b>.</li>
+      <li>No <b>Controle de Doces</b>: <b>Vendas → Celular → Importar vendas do celular</b> e escolha o arquivo.</li>
+      <li>Pode importar o mesmo arquivo mais de uma vez: venda repetida não entra duas vezes.</li></ol></div>
+    <div class="sec">Outras opções</div>
+    <div style="display:grid;gap:8px">
+      <button class="btn btn-gh" id="b-baixar" ${pend.length ? "" : "disabled"}>Baixar arquivo (sem compartilhar)</button>
+      <button class="btn btn-gh" id="b-hoje" ${hoje.length ? "" : "disabled"}>Reenviar todas as vendas de hoje (${hoje.length})</button>
+    </div>
+    <div class="sec">Catálogo</div>
+    <div class="card" style="padding:12px 14px" class="small">${D.cat ? `<b>${esc(D.cat.loja)}</b> · ${D.cat.p.length} doces<br><span class="tiny muted">recebido em ${dataBR(D.cat.em)} ${D.cat.em.slice(11, 16)}. Para atualizar preços e estoque, gere um novo link no computador (Vendas → Celular).</span>` : `<span class="muted">Nenhum catálogo ainda.</span>`}
+      <span class="label">Colar link do catálogo</span><div class="row"><input class="inp" id="cat-link" placeholder="cole aqui o link que veio do computador"><button class="btn btn-pri btn-sm" id="cat-ok">Usar</button></div></div>
+    <p class="tiny muted" style="text-align:center;margin:18px 0">As vendas ficam guardadas só neste celular até serem enviadas. Não limpe os dados do navegador antes de enviar.</p>`;
+  $("#b-env").onclick = () => enviar(pend);
+  $("#cat-ok").onclick = async () => { const t = $("#cat-link").value.trim(); if (!t) return toast("Cole o link do catálogo.", true); if (await lerCatalogoDoLink(t)) ir("vender"); };
+  $("#b-baixar").onclick = () => { const f = arquivoVendas(pend); const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; a.click(); };
+  $("#b-hoje").onclick = () => enviar(hoje, true);
+  // limpa vendas enviadas há mais de 60 dias
+  const lim = Date.now() - 60 * 864e5, antes = D.vendas.length;
+  D.vendas = D.vendas.filter((v) => !(v.enviada && (v.enviada_em || v.ts) < lim) && !(v.removida && v.ts < lim));
+  if (D.vendas.length !== antes) salvar();
+}
+
+$$("nav.bottom button").forEach((b) => (b.onclick = () => ir(b.dataset.t)));
+window.addEventListener("hashchange", async () => { if (await lerCatalogoDoLink()) ir("vender"); });
+(async function () {
+  carregar();
+  await lerCatalogoDoLink();
+  if (!D.aparelho) D.aparelho = uid();
+  ir("vender");
+  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>
